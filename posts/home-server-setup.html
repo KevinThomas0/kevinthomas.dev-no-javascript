@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<title>Home Server Setup</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content, 
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l4">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>Home server setup</b></h3>
+                        <h5><span class="w3-opacity">July 18, 2020</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>For the past few months, I’ve been interested in switching from a lot of the proprietary
+                            cloud services I use to self hosted free and open source alternatives. Back in late June,
+                            after a lot of research, I finally bought my first home server to accomplish this. I ended
+                            up getting a <strong>Dell Poweredge R220</strong> server with the following specs:
+                        <ul>
+                            <li>Intel Xeon E3-1240 V3 8M Cache 3.40 GHz Quad Core (8 Threads)</li>
+                            <li>4x 4gb 10600E DDR3 Memory</li>
+                            <li>H310 Raid Controller</li>
+                            <li>2x Brand New 1TB SAS Hard Drives</li>
+                        </ul>
+                        I bought this server used from Ebay, and got the new hard drives from Newegg (I didn’t know how
+                        old the drives that came with the server were, so I wanted to get new ones). I configured the
+                        server with:
+                        <ul>
+                            <li>Debian GNU/Linux 10 (Buster)</li>
+                            <li>Raid 1 Configuration using the H310 Raid Controller</li>
+                            <li>Docker</li>
+                        </ul>
+                        Here are some of the services I'm currently hosting:
+                        <ul>
+                            <li>Airsonic - music streaming</li>
+                            <li>Droppy - file sharing</li>
+                            <li>LinuxServer Swag - nginx webserver and reverse proxy</li>
+                            <li>Minecraft Server - game server</li>
+                            <li>Mumble Server - voice over IP server</li>
+                            <li>Nextcloud - file hosting</li>
+                            <li>Taskcafe - kanban board</li>
+                            <li>Watchtower - automatic docker image updates</li>
+                            <li>Wireguard - VPN</li>
+                        </ul>
+                        Overall this has been a very fun experience. It took a lot of setup, research, trial and error,
+                        and troubleshooting, but I’m now at a point where all of these services are working great for
+                        me. My skills in server management, Docker, routing, Debian, and security have all increased a
+                        huge amount in the last month, so that has been very rewarding. I’m always looking for new
+                        useful services to self host, so I’m sure this list will grow over time.
+                        </p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinNThomas/kevinthomas.dev-no-javascript" target="_blank">here</a>.</p>
+    </footer>
+</body>
+
+</html>

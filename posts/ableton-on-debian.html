@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<title>How to install and run Ableton Live 10 on Debian</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content, 
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l4">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>How to install and run Ableton Live 10 on Debian</b></h3>
+                        <h5><span class="w3-opacity">July 22, 2020</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>There are a few caveats to installing and running Ableton Live 10 on Linux, and I initially
+                            had some issues getting it working on Debian that I couldn’t find solutions for online.
+                            Here’s how I got it working:
+                        <ol>
+                            <li>Download Ableton Live 10 (Windows 64 Bit) from Ableton’s website</li>
+                            <li>Extract the zip file</li>
+                            <li>You should now see a file called Setup.msi. Wine doesn’t work with msi
+                                files, you’ll need to install the package msitools to work with msi files:
+                                <code>sudo apt install msitools</code>
+                            </li>
+                            <li>Normally, to install an msi file, you would run <code>msiexec /i Setup.msi</code>,
+                                however, that wasn’t working for me. It would just run for a few seconds then finish
+                                with no output or results. Instead, run the msiextract command:
+                                <code>msiextract Setup.msi</code></li>
+                            <li>You should now see two folders: Ableton and System64. You can move these two folders to
+                                wherever you want Ableton to be installed</li>
+                            <li>To run Ableton, use wine with a 64 bit prefix to run the Ableton exe file:
+                                <code>WINEPREFIX=/path/to/wine64prefix wine Ableton/Live\ 10\ Suite/Program/Ableton\ Live\ 10\
+                                Suite.exe</code></li>
+                            <li>Ableton should now be up and running!</li>
+                        </ol>
+                        Note: Online authorization probably won’t work. Follow Ableton’s instructions for offline
+                        authorization to get your copy of Ableton authorized.</p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinNThomas/kevinthomas.dev-no-javascript" target="_blank">here</a>.</p>
+    </footer>
+</body>
+
+</html>
