@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<title>How to use hardware acceleration with Flatpak Firefox</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content, 
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l2">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>How to use hardware acceleration with Flatpak Firefox</b></h3>
+                        <h5><span class="w3-opacity">December 9, 2020</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>This is how I was able to get hardware acceleration working on Flatpak Firefox (version 83.0
+                            at the time of writing this). Note that I am using an AMD GPU for this, though I believe it
+                            should work with other brands as well. This guide is for the Xorg display server.
+                        <ol>
+                            <li>Follow the instructions on the Arch wiki <a
+                                    href="https://wiki.archlinux.org/index.php/Hardware_video_acceleration#Verifying_VA-API"
+                                    target="_blank">here</a> on how to verify if your GPU supports hardware acceleration
+                                and which codecs it supports
+                            </li>
+                            <li>Install the org.freedesktop.Platform.ffmpeg-full
+                                flatpak: <code>flatpak install org.freedesktop.Platform.ffmpeg-full</code>. Choose
+                                branch 19.08 when prompted</li>
+                            <ul>
+                                <li>(Some people report they also had to install org.freedesktop.Platform.VAAPI.Intel.
+                                    Maybe that's only for Intel integrated GPUs?)</li>
+                            </ul>
+                            <li>Set the following environment variables in order to enable hardware acceleration and
+                                logging so that you can verify it's working later:
+                                <code>flatpak override --env="MOZ_X11_EGL=1 MOZ_LOG=PlatformDecoderModule:5" org.mozilla.firefox</code>
+                            </li>
+                            <li>In Firefox, type about:config in the URL bar and set the following settings:
+                                <pre><code>gfx.webrender.all=true
+media.ffmpeg.vaapi.enabled=true
+media.ffvpx.enabled=false
+media.av1.enabled=false
+media.ffmpeg.dmabuf-textures.enabled=true</code></pre>
+                            </li>
+                            <li>In Firefox, type about:support in the URL bar, go the "Graphics" table, and confirm that
+                                "Composting" is set to "WebRender."</li>
+                            <li>To allow hardware decoding on YouTube, the video codec used must be supported by the
+                                hardware. By default, YouTube streams VP8/VP9 encoded video, and since my GPU doesn't
+                                support decoding of that codec, I use the <a
+                                    href="https://addons.mozilla.org/en-US/firefox/addon/h264ify/"
+                                    target="_blank">h264ify</a> extension to force H.264 videos on YouTube. I recommend
+                                installing this extension if you are in the same position.</li>
+                            <li>Verify that hardware acceleration is working by running the Firefox Flatpak from the
+                                terminal with verbose logging: <code>flatpak run --verbose org.mozilla.firefox</code>.
+                                Then, open a YouTube video. Right as the video starts playing, look for logs indicating
+                                that it's working. As an example, I will show the relevant lines of output from the logs
+                                that I see, indicating that it's working:
+                                <pre><code>[Child 389: MediaPDecoder #2]: D/PlatformDecoderModule Initialising VA-API FFmpeg decoder
+libva info: VA-API version 1.5.0
+libva info: va_getDriverName() returns 0
+libva info: Trying to open /usr/lib/x86_64-linux-gnu/dri/radeonsi_drv_video.so
+libva info: Trying to open /usr/lib/x86_64-linux-gnu/dri/intel-vaapi-driver/radeonsi_drv_video.so
+libva info: Trying to open /usr/lib/x86_64-linux-gnu/GL/lib/dri/radeonsi_drv_video.so
+libva info: Found init function __vaDriverInit_1_5
+libva info: va_openDriver() returns 0
+[AVHWDeviceContext @ 0x7f4efb9fad00] VAAPI driver: Mesa Gallium driver 20.1.2 for Radeon RX Vega (VEGA10,
+DRM 3.39.0, 5.9.12-xanmod1, LLVM 9.0.1).
+[Child 389: MediaPDecoder #2]: D/PlatformDecoderModule VA-API FFmpeg init successful
+[Child 389: MediaPDecoder #3]: D/PlatformDecoderModule Choosing FFmpeg pixel format for VA-API video decoding.</code></pre>
+                            </li>
+                        </ol>
+                        I will try and update this post if this stops working and/or if steps need to be updated. Hope
+                        it helps!</p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinNThomas/kevinthomas.dev-no-javascript" target="_blank">here</a>.</p>
+    </footer>
+</body>
+
+</html>
