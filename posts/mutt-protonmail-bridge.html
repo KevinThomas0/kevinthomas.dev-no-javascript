@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<title>Using mutt, ProtonMail Bridge, and isync for email on Linux</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content, 
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l2">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>Using mutt, ProtonMail Bridge, and isync for email on Linux</b></h3>
+                        <h5><span class="w3-opacity">February 13, 2021</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>Recently, offlineimap was removed from many Linux distros due to it relying on Python 2, and
+                            I found myself needing a new solution for using mutt (my email client of choice) and
+                            ProtonMail Bridge. I was able to use the program isync as a substitute.
+                            My initial setup for mail with offlineimap was based off this excelent post:
+                            <a href=https://spaceandtim.es/code/protonmail_mutt
+                                target="_blank">https://spaceandtim.es/code/protonmail_mutt</a> so you can refer to it
+                            for a lot of the reasoning behind this configuration.
+                            I'm personally using Gentoo, but this should work on most distros.
+                        <h3>isync</h3>
+                        Install isync. Once installed, you can configure isync by creating a file named
+                        <code>.mbsyncrc</code> in your home directory. Here is what mine looks like for getting it
+                        working with ProtonMail Bridge:
+                        <pre>
+SyncState *
+Sync Pull All Push All
+    
+IMAPAccount [Put email here]
+Host 127.0.0.1
+Port 1143
+User [Put email here]
+Pass [Put ProtonMail Bridge password here]
+SSLType None
+AuthMechs LOGIN
+    
+IMAPStore kevin-remote
+Account [Put email here]
+UseNamespace yes
+    
+MaildirStore kevin-local
+SubFolders Verbatim
+Inbox ~/Mail/kevin/INBOX
+Path ~/Mail/kevin/
+Flatten .
+    
+Channel kevin
+Master :kevin-remote:
+Slave :kevin-local:
+Patterns *
+Create Both
+Expunge Both
+</pre>
+                        <h3>mutt</h3>
+                        Here are the relevant parts of my <code>.muttrc</code> file in my home directory:
+                        <pre>
+set mbox_type=Maildir
+set folder=~/Mail/kevin
+set mail_check=2 # seconds
+
+# smtp
+set my_user=[Put email here]
+set my_pass=[Put ProtonMail Bridge password here]
+set smtp_url=smtp://[Put email here]:[Put ProtonMail Bridge password here]@127.0.0.1:1025
+set ssl_starttls
+set spoolfile = "+INBOX"
+mailboxes +INBOX +Archive +Sent +Trash +Spam
+</pre>
+                        <h3>mbsync</h3>
+                        You can run <code>mbsync [channel name]</code> to sync your mail, for example:
+                        <code>mbsync kevin</code>. So I have setup a cron job to sync my mail every five minutes:
+                        <pre>
+*/5 * * * * /usr/bin/mbsync kevin
+</pre>
+                        <h3>Conclusion</h3>
+                        With ProtonMail Bridge running in the background (I personally use protonmail-bridge-cli) and a
+                        configured isync running periodically, I can now use mutt with ProtonMail Bridge comfortably.
+                        Hope this helps!
+                        </p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinNThomas/kevinthomas.dev-no-javascript" target="_blank">here</a>.
+        </p>
+    </footer>
+</body>
+
+</html>
