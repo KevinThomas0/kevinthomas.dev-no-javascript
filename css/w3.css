@@ -241,6 +241,11 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 .dracula-green,.hover-dracula-green:hover{color:#50fa7b!important;background-color:#44475a!important}
 .dracula-yellow,.hover-dracula-yellow:hover{color:#f1fa8c!important;background-color:#282a36!important}
 
+pre {
+    overflow: auto;
+    white-space: pre;
+}
+
 @font-face {
     font-family: 'Ubuntu Condensed';
     src: url('/fonts/Ubuntu-C.ttf') format('truetype');
