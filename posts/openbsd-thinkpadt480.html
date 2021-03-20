@@ -137,6 +137,15 @@ dhcp
                         <h3>Improving slowness</h3>
                         OpenBSD was basically unusably slow out of the box on my Thinkpad T480. Here are the steps I took to improve
                         its slowness and make it useable for desktop tasks.
+                        <h4>Thunderbolt</h4>
+                        There seem to be conflicting reports on how Thunderbolt plays an effect on OpenBSD being slow on the T480.
+												u/bioctl on reddit <a href="https://www.reddit.com/r/openbsd/comments/gs3c9i/openbsd_slow_after_suspend/"
+												target="_blank">reported</a> that Thunderbolt seemed to be causing an acpi0 interrupt that would slow
+                        down their T480, so they disabled it. However,
+                        <a href="https://www.youtube.com/watch?v=JgJUy9Bx4wo" target="_blank">iBSD</a> reports that enabling
+                        "Thunderbold BIOS Assist" in the BIOS settings is what fixes the slowness issue (specifically after
+                        a shutdown rather than a restart). I believe this is what fixed the issue for me, so the iBSD fix
+                        is the one I would recommend trying first.
                         <h4>Use intel driver</h4>
                         By default Xorg was using the modsetting driver which I believe has worse performance than the intel driver.
                         To use the intel driver, create an xorg conf file: <code>doas vim /etc/X11/xorg.conf</code> and add the
@@ -206,14 +215,9 @@ kern.maxthread=4096
 												<pre>
 swap /home/kevin/.cache mfs rw,nodev,nosuid,-s=300m 0 0
 </pre>
-												<h4>Disable thunderbolt</h4>
-												u/bioctl on reddit <a href="https://www.reddit.com/r/openbsd/comments/gs3c9i/openbsd_slow_after_suspend/"
-												target="_blank">discovered</a> that Thunderbolt seemed to be causing an acpi0 interrupt that would slow
-												down their T480. I believe I was running into the same thing, so I disabled Thunderbolt in my BIOS settings.
 												<h4>Restart your computer</h4>
 												Now, hopefully you see a massive performance gain. You should be able to move windows around without lag,
-												and Firefox should be responsive and useable. I sometimes still get bouts of slowness and have to restart
-												my laptop to get it fixed, but hopefully I can figure that out and update this post when I do.
+												and Firefox should be responsive and useable.
                         </p>
                     </div>
                 </div>
