@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<title>Installing and setting up OpenBSD on Thinkpad T480 + improving slowness</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content,
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l2">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>Installing and setting up OpenBSD on Thinkpad T480 + improving slowness</b></h3>
+                        <h5><span class="w3-opacity">March 18, 2021</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>This guide will explain how I installed and setup OpenBSD on my Thinkpad T480 with full
+                           disk encryption, and how I improved the slowness I was experiencing out of the box.
+                           <br />
+                           <br />
+                           My specs:
+                           <ul>
+                             <li>Model: Thinkpad T480</li>
+                             <li>CPU: Intel i5-8350U</li>
+                             <li>GPU: Intel(R) UHD Graphics 620</li>
+                             <li>Memory: 16 Gigabytes</li>
+                             <li>Storage: 1TB SATA SSD</li>
+                           </ul>
+                        <h3>Installation</h3>
+                        <h4>Setting up installation media</h4>
+                        Installing OpenBSD with full disk encryption was actually fairly simple. Install the amd64
+                        .img file from the OpenBSD website here:
+                        <a href="https://www.openbsd.org/faq/faq4.html#Download" target="_blank">
+                          https://www.openbsd.org/faq/faq4.html#Download</a>. Grab a flash drive and format it
+                        with the FAT 32 file system (this can be done easily with a graphical tool like GParted).
+                        Burn the .img file to the flashdrive with the following command (make sure you are burning
+                        to the right device, the <code>dd</code> command can be dangerous):
+                        <pre>
+sudo dd bs=4M if=Downloads/openbsd.img of=/dev/sdb conv=fdatasync
+</pre>
+                        Now, reboot your laptop, and press "Enter" on the splash screen and enter your BIOS settings.
+                        Navigate to the boot section and select your USB device as your boot device. Save and exit.
+                        <h4>Full disk encryption</h4>
+                        Let's setup full disk encryption. The OpenBSD website has a great guide on this:
+                        <a href="https://www.openbsd.org/faq/faq14.html#softraidFDE">
+                          https://www.openbsd.org/faq/faq14.html#softraidFDE
+                        </a>. Following that guide exactly worked great for me. I recommend choosing the GPT option for
+                        UEFI booting, as that is how the Thinkpad T480 boots by default. Keep in mind the
+                        <code>sd#</code> that it chooses for you might be different than the <code>sd1</code> in the
+                        guide, and that's okay (for example, I believe <code>sd1</code> was my USB drive when I did
+                        my installation, so the installer defaulted to <code>sd3</code>, which worked fine). Once you go
+                        through that guide, you should already be back at the main installer and have chosen your new device
+                        for installation.
+                        <h4>Main installation</h4>
+                        The installer is very simple, as almost every prompt has sane default values that you can change
+                        if you know you want to. For the network interface selection, you're going to want to select
+                        <code>em0</code> for now, as that is the ethernet interface which will work out of the box.
+                        We will setup wifi later. I also used <code>dhcp</code> for the IP address. I chose to install
+                        the X Window System and create a user account. For disk partitioning, you can confirm you are installing
+                        to the right disk by pressing the '?' key and seeing your list of devices, confirming which one you
+                        set as your root partition earlier. Use whole disk GPT Partitioning if you chose GPT earlier when
+                        setting up disk encryption.
+                        <br />
+                        <br />
+                        For the disk layout, you could just use the automatic layout, but I prefer all my directories on the same
+                        partition, so I used this custom layout:
+                        <pre>
+sd0> a b
+offset: [128]
+size: [xxx] 8G
+FS type: [swap]
+sd0*> a
+partition: [a]
+offset: [xxx]
+size: [xxx]
+FS type: [4.2BSD]
+mount point: [none] /
+sd0*> w
+sd0> q
+</pre>
+                        After this, you can simply select <code>http</code> for the location of sets, and select a close mirror.
+                        Then, you should be done. Just restart to boot into your new OS (make sure to remove your USB drive).
+                        <h3>Post-installation setup</h3>
+                        <h4>doas</h4>
+                        Getting the <code>doas</code> command to work with your normal user makes life a lot easier because you
+                        can perform operations with root level privilege. First switch to your root user: <code>su root</code>.
+                        Then, edit the doas conf file: <code>vi /etc/doas.conf</code>. Put this line in the conf file:
+                        <code>permit :wheel</code>. This will allow users in the wheel group to use the <code>doas</code> command
+                        (your user should already be in that group). You can now use <code>doas</code> to run commands requiring
+                        root level permissions, like installing packages: <code>doas pkg_add vim</code>.
+                        <h4>Wifi</h4>
+                        You probably want to get wifi setup. Install missing firmware with: <code>doas fw_update</code>.
+                        Run the command <code>ifconfig</code> to see your list of network interfaces. Your wifi interface should
+                        be <code>iwm0</code>, so you should create the following file for this interface:
+                        <code>doas vim /etc/hostname.iwm0</code>. Inside the file, setup your wifi credentials like this
+                        (replacing "MyWifiNetwork" and "MyWifiPassword" with their actual values):
+                        <pre>
+nwid MyWifiNetwork wpakey MyWifiPassword
+dhcp
+</pre>
+                        Connect to your wifi network by running: <code>doas dhclient iwm0</code>. You shoud now have your wifi setup.
+                        <h3>Improving slowness</h3>
+                        OpenBSD was basically unusably slow out of the box on my Thinkpad T480. Here are the steps I took to improve
+                        its slowness and make it useable for desktop tasks.
+                        <h4>Thunderbolt</h4>
+                        There seem to be conflicting reports on how Thunderbolt plays an effect on OpenBSD being slow on the T480.
+												u/bioctl on reddit <a href="https://www.reddit.com/r/openbsd/comments/gs3c9i/openbsd_slow_after_suspend/"
+												target="_blank">reported</a> that Thunderbolt seemed to be causing an acpi0 interrupt that would slow
+                        down their T480, so they disabled it. However,
+                        <a href="https://www.youtube.com/watch?v=JgJUy9Bx4wo" target="_blank">iBSD</a> reports that enabling
+                        "Thunderbold BIOS Assist" in the BIOS settings is what fixes the slowness issue (specifically after
+                        a shutdown rather than a restart). I believe this is what fixed the issue for me, so the iBSD fix
+                        is the one I would recommend trying first.
+                        <h4>Use intel driver</h4>
+                        By default Xorg was using the modsetting driver which I believe has worse performance than the intel driver.
+                        To use the intel driver, create an xorg conf file: <code>doas vim /etc/X11/xorg.conf</code> and add the
+                        following:
+                        <pre>                        
+Section "Device"
+        Identifier "Intel Graphics"
+        Driver "intel"
+EndSection
+</pre>                        
+												<h4>Add user to staff group and class</h4>
+												The staff group/class is granted more system performance by default, add your user to it:
+												<pre>
+doas usermod -L staff user
+doas usermod -G staff user
+</pre>
+												<h4>Enable apmd</h4>
+												Enable the power management daemon: <code>doas rcctl enable apmd</code>.
+												Then add this line to <code>/etc/rc.conf.local</code>:
+												<pre>
+apmd_flags=-A
+</pre>
+
+												This sets the daemon to "automatic performance adjustment mode."
+												<h4>Edit login.conf</h4>
+												The login.conf file is where resource limits for different classes of users are defined.
+												Since I want my user to not be bottlenecked by these limits, I made adjustments in the
+												"staff" section, increasing resource limits by a lot. Edit your <code>/etc/login.conf</code> file,
+												and change the "staff" section to this:
+												<pre>
+#
+# Staff have fewer restrictions and can login even when nologins are set.
+#
+staff:\
+	:datasize-cur=16384M:\
+	:datasize-max=infinity:\
+	:maxproc-max=1024:\
+	:maxproc-cur=1024:\
+	:stacksize-cur=8M:\
+	:ignorenologin:\
+	:requirehome@:\
+	:tc=default:
+</pre>
+												<h4>Edit sysctl.conf</h4>
+												I increased some resource limits in my sysctl.conf file as well. Make a <code>/etc/sysctl.conf</code>
+												file and add these lines:
+												<pre>
+kern.maxproc=32768
+kern.maxthread=4096
+</pre>
+												I believe you can also enable hyperthreading in this file (OpenBSD has it disabled by default for security reasons),
+												however, I choose to keep it off.
+												<h4>Soft Updates</h4>
+												<a href="https://www.openbsd.org/faq/faq14.html#SoftUpdates" target="_blank">Soft Updates</a> can be enabled
+												to improve performance. Simply edit your <code>/etc/fstab</code> file, and make sure the <code>softdep</code>
+												flag is added to your root partition. For example:
+												<pre>
+26bfefb4e47ee753.a / ffs rw,wxallowed,softdep 1 1
+</pre>
+												<h4>ulimit</h4>
+												Add this line to your <code>~/.xsession</code> to disable home directory core dumps:
+												<code>ulimit -Sc 0</code>
+												<h4>mfs</h4>
+												You can use an <a href="https://dataswamp.org/%7Esolene/2018-05-08-mfs-tmp.html" target="_blank">mfs</a>
+												filesystem for your cache directory to improve performance. Simply create an entry for it in your
+												<code>/etc/fstab</code> file:
+												<pre>
+swap /home/kevin/.cache mfs rw,nodev,nosuid,-s=300m 0 0
+</pre>
+												<h4>Restart your computer</h4>
+												Now, hopefully you see a massive performance gain. You should be able to move windows around without lag,
+												and Firefox should be responsive and useable.
+                        </p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinNThomas/kevinthomas.dev-no-javascript" target="_blank">here</a>.
+        </p>
+    </footer>
+</body>
+
+</html>
