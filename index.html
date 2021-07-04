@@ -80,6 +80,32 @@ and is wrapped around the whole page content, except for the footer in this exam
                         <h4>Posts</h4>
                     </div>
                 </div>
+				<!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>How to fix "mounting [lvm-partition] on /sysroot failed: I/O error"</b></h3>
+                        <h5><span class="w3-opacity">July 4, 2021</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>Recently, after booting up my laptop after it ran out of power, I ran into this error
+							after being dumped into the initramfs emergency shell:
+                            <pre>
+ mount: mounting /dev/mapper/vg0-root on /sysroot failed: I/O error
+ </pre>
+                            This ended up happening because of some invalid blocks on my lvm partition
+                            (I have a fully encrypted LVM on LUKS setup on my machine).
+                            Here's how I was able to fix it (this was on Alpine Linux, hopefully it helps with other
+                            distros too).
+                        </p>
+                        <div class="w3-row">
+                            <div class="w3-col m8 s12">
+                                <p><a href="/posts/fixing-lvm-mounting-io-error.html"><button
+                                            class="w3-button w3-padding-large dracula-bg w3-border"><b>READ
+                                                MORE »</b></button></a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- Blog entry -->
                 <div class="w3-card-4 w3-margin">
                     <div class="w3-container">
@@ -237,7 +263,7 @@ and is wrapped around the whole page content, except for the footer in this exam
     </div>
     <!-- Footer -->
     <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
-        <p>© 2020 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+        <p>© 2021 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
                 target="_blank">Dracula</a> theme. Get the source code for this website
             <a href="https://gitlab.com/KevinThomas0/kevinthomas.dev-no-javascript" target="_blank">here</a>.
         </p>

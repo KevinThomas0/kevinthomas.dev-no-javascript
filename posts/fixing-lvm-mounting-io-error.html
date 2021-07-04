@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<title>How to fix "mounting [lvm-partition] on /sysroot failed: I/O error"</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/css/w3.css">
+<style>
+    body,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5 {
+        font-family: "Ubuntu Condensed", sans-serif
+    }
+</style>
+
+<body class="dracula-bg">
+    <!-- w3-content defines a container for fixed size centered content,
+and is wrapped around the whole page content, except for the footer in this example -->
+    <div class="w3-content" style="max-width:1400px">
+        <!-- Header -->
+        <header class="w3-container w3-center w3-padding-32 dracula-pink">
+            <h1><b>Kevin Thomas Development</b></h1>
+        </header>
+        <!-- Grid -->
+        <div class="w3-row">
+            <!-- Introduction menu -->
+            <div class="w3-col l2">
+                <!-- Navigation -->
+                <div class="w3-card w3-margin">
+                    <div class="w3-container w3-padding dracula-current-line">
+                        <h4>Navigation</h4>
+                    </div>
+                    <ul class="w3-ul w3-hoverable dracula-bg">
+                        <li class="w3-padding-16">
+                            <span class="w3-large"><a href="../index.html">Back to Home</a></span><br>
+                        </li>
+                    </ul>
+                </div>
+                <!-- END Introduction Menu -->
+            </div>
+            <!-- Main page -->
+            <div class="w3-col l8 s12">
+                <!-- Blog entry -->
+                <div class="w3-card-4 w3-margin">
+                    <div class="w3-container">
+                        <h3><b>How to fix "mounting [lvm-partition] on /sysroot failed: I/O error"</b></h3>
+                        <h5><span class="w3-opacity">March 18, 2021</span></h5>
+                    </div>
+                    <div class="w3-container">
+                        <p>Recently, after booting up my laptop after it ran out of power, I ran into this error
+							after being dumped into the initramfs emergency shell:
+							<pre>
+mount: mounting /dev/mapper/vg0-root on /sysroot failed: I/O error
+</pre>
+							This ended up happening because of some invalid blocks on my lvm partition
+							(I have a fully encrypted LVM on LUKS setup on my machine).
+							Here's how I was able to fix it (this was on Alpine Linux, hopefully it helps with other
+							distros too):
+							<h3>Flash your distro's live image to a USB drive and boot into it</h3>
+							You need to be running an external environment to repair your partition.
+							<h3>Install the necessary packages</h3>
+							For me, this was lvm2, cryptsetup, and e2fsprogs:
+							<pre>
+apk add lvm2 cryptsetup e2fsprogs
+</pre>
+							<h3>Setup LUKS partition</h3>
+							In my case, <code>/dev/sda2</code> was my LUKS container partition:
+							<pre>
+cryptsetup luksOpen /dev/sda2
+</pre>
+							<h3>Activate the logical volumes</h3>
+							<pre>
+vgchange -ay
+</pre>
+							<h3>vgscan with --mknodes</h3>
+							I found that this was needed for the repair to work. After running this command:
+							<pre>
+vgscan --mknodes
+</pre>
+							And running <code>blkid</code>, I found three new entires, one of them being:
+							<pre>
+/dev/dm-3
+</pre>
+							This entry had the same UUID as my <code>/dev/mapper/vg0-root</code> partition,
+							so I knew this is the one I needed to repair.
+							<h3>Run fsck to fix the partition</h3>
+							Since my partition was an ext4 partition:
+							<pre>
+fsck -t ext4 /dev/dm-3
+</pre>
+							In my case, this detected some journal checksum errors that this program was able to
+							fix. After fixing them, I was able to boot into my machine again. I hope this helps
+							anyone running into this problem!
+                        </p>
+                    </div>
+                </div>
+                <!-- END MAIN PAGE -->
+            </div>
+            <!-- END GRID -->
+        </div><br>
+        <!-- END w3-content -->
+    </div>
+    <!-- Footer -->
+    <footer class="w3-container dracula-green w3-padding-small w3-margin-top">
+        <p>© 2021 Kevin Thomas. This website is free of JavaScript and uses the <a href="https://draculatheme.com/"
+                target="_blank">Dracula</a> theme. Get the source code for this website
+            <a href="https://gitlab.com/KevinThomas0/kevinthomas.dev-no-javascript" target="_blank">here</a>.
+        </p>
+    </footer>
+</body>
+
+</html>
